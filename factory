@@ -1,0 +1,101 @@
+// Returns a random DNA base
+const returnRandBase = () => {
+  const dnaBases = ['A', 'T', 'C', 'G'];
+  return dnaBases[Math.floor(Math.random() * 4)];
+};
+
+// Returns a random single stand of DNA containing 15 bases
+const mockUpStrand = () => {
+  const newStrand = [];
+  for (let i = 0; i < 15; i++) {
+    newStrand.push(returnRandBase());
+  }
+  return newStrand;
+};
+
+
+let pAequorFactory = (specimenNum, dna) => {
+  return {
+    specimenNum,
+    dna,
+    mutate() { //changes a random base to another, not including seleted base value.
+      let bases = ['A','T', 'C', 'G'];
+      let index = Math.floor(Math.random() * 15)
+      let filteredBase = bases.filter(base => base != this.dna[index]);
+      filteredBase = filteredBase[Math.floor(Math.random() * 3)];
+      let removedBase = this.dna.splice(index, 1, filteredBase);
+    },
+  
+    compareDNA(pAequor) { //compares 2 strandes of dna and returns their likeness as a percent
+      let identicalBases = 0;
+      console.log(this.dna);
+      console.log(pAequor);
+      for (let i = 0; i < this.dna.length; i++){
+        for (let j = 0; j < pAequor.length; j++){
+          if (this.dna[i] === pAequor[j] && i === j){
+          identicalBases++;
+        }
+      }
+    }
+      let percentSame = (identicalBases / 15) * 100;
+      console.log(`specimen #1 and specimen #2 have ${percentSame.toFixed(2)}% DNA in common`);
+  },
+
+    willLikelySurvive(){ // calculates percent of g and c bases if over 60% it will likely survive 
+       let g = 0
+       let c = 0;
+       for (n = 0; n < this.dna.length; n++){
+       if (this.dna[n] === 'C'){
+         c++;
+       } else if (this.dna[n] === 'G'){
+         g++
+       }
+     }
+     let percentGC = (g + c) / 15 * 100;
+     if (percentGC >= 60){
+       return true;
+     } else {
+       return false;
+     }
+   },
+   complimentStrand() { // returns the opposite(complientary) strand
+    let complimentaryStrand = [];
+    for (let i = 0; i < this.dna.length; i++){
+      if(this.dna[i] === 'A'){
+        complimentaryStrand.push('T');
+      } else if (this.dna[i] === 'T'){
+        complimentaryStrand.push('A');
+      } else if (this.dna[i] === 'G'){
+        complimentaryStrand.push('C');
+      } else {
+        complimentaryStrand.push('G');
+      }
+    }
+    return complimentaryStrand;
+   }
+  }
+}
+
+
+let survivableStoredDNA = [];
+// allows you to create as many survivable strands as you would like
+let createDNA = x =>{
+  let s = 1;
+  while (survivableStoredDNA.length < x){
+    let holderDNA = pAequorFactory(s, mockUpStrand());
+    if (holderDNA.willLikelySurvive()){
+      let storedDNA = { }
+      storedDNA[holderDNA.specimenNum] = holderDNA.dna;
+      survivableStoredDNA.push(storedDNA);
+      s++
+    }
+    
+  }
+  return survivableStoredDNA;
+}
+
+createDNA(30);
+console.log(survivableStoredDNA);
+
+
+
